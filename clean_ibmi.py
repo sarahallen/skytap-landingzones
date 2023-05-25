@@ -23,7 +23,7 @@ exr_region = '' # (?) same as Skytap's envs' regions????? ****
 
 ## Constants
 '''
-These variables  wil be constantly used throughout the script.
+These variables and functions will be constantly used throughout the script.
 Do not modify them. 
 '''
 
@@ -32,20 +32,20 @@ auth = (user_account, API_key)
 headers = { 'Accept': 'application/json', 'Content-type': 'application/json'}
 
 def skytap_url(type, env_id=''):
-    # Create new environments
+    # To create new environments
     if type == 'configurations':
         return url + 'configurations.json'
 
-    # Create new LPARs or VMs
-    # Modify network configuration
+    # To create new LPARs or VMs
+    # To modify network configuration
     elif type == 'environment':
         return url + f'configurations/{env_id}.json'
 
-    # Generate public IP address
+    # To generate public IP address
     elif type == 'ip_address':
         return url + 'ips/acquire.json'
 
-    # New WAN/Azure ExpressRoute
+    # To create WANs/Azure ExpressRoute
     elif type == 'wan':
         return url + 'vpns.json'
     
@@ -66,3 +66,21 @@ def skytap_url(type, env_id=''):
 'https://cloud.skytap.com/vpns.json' --> WAN resources
     - Create new ExpressRoute
 '''
+
+
+## Create a new environment
+api_response = requests.post(skytap_url('configurations'),
+                             headers=headers,
+                             auth=auth,
+                             params={
+                                 'template_id': env_template,
+                                 'name': env_name,
+                             })
+
+print('HTTP status_code = %s' % api_response.status_code)
+json_output = json.loads(api_response.text)
+print(json.dumps(json_output, indent = 4))
+
+json_data = api_response.json() if api_response and api_response.status_code== 200 else None
+env_id = json_data['id'] if json_data and 'id' in json_data else None
+print('Environment ID: %s' % env_id)
