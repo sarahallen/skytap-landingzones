@@ -95,3 +95,5 @@ if json_data and 'id' in json_data:
 #check for expressroute to finish provisioning
 
 #attach environment to expressroute 
+
+

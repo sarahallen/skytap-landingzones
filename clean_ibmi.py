@@ -31,7 +31,7 @@ url = 'https://cloud.skytap.com/'
 auth = (user_account, API_key)
 headers = { 'Accept': 'application/json', 'Content-type': 'application/json'}
 
-def url(type, env_id=''):
+def skytap_url(type, env_id=''):
     # Create new environments
     if type == 'configurations':
         return url + 'configurations.json'
