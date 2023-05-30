@@ -10,12 +10,13 @@ Please gather and fill in all your information prior to running your script.
 '''
 user_account = 'account@skytap.com' # Skytap user account
 API_key = '0000000' # API key or user account password
-env_region = '' # Insert region name of your landing zone
+env_region = '' # Insert region name of your landing zone (see README)
 env_template = '0000000' # Insert region-based environment template ID
 env_name = 'Sample Name' # Assign preferred name to your new environment
 vm_template = '0000000' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
+# ^ (?) does not get used in this scripted case, should it??????
 exr_key = '0000000' # Azure ExpressRoute service key
 exr_region = '' # (?) same as Skytap's envs' regions????? ****
 
@@ -105,3 +106,29 @@ api_response = requests.put(skytap_url('environment', env_id),
                             })
 
 print("HTTP status_code = %s" % api_response.status_code)
+
+
+## Configure environment network
+api_response = requests.put(skytap_url('environment', env_id),
+                            headers=headers,
+                            auth=auth,
+                            params={
+                                'subnet': env_subnet
+                            })
+
+print("HTTP status_code = %s" % api_response.status_code)
+
+
+## Acquire public IP in same region as environment
+api_response = requests.post(skytap_url('ip_address'),
+                             headers=headers,
+                             auth=auth,
+                             params={
+                                 'region': env_region
+                             })
+
+
+json_data = api_response.json() if api_response and api_response.status_code== 200 else print("Unable to create public IP. Revise account limits.")
+public_ip_id = json_data["id"] if json_data and 'id' in json_data else None
+print('public_ip_id = %s' % public_ip_id) if public_ip_id else None
+
