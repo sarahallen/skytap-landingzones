@@ -18,7 +18,6 @@ env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 # ^ (?) does not get used in this scripted case, should it??????
 exr_name = '' # Assign preferred name to ExpressRoute circuit
-exr_region = '' # (?) same as Skytap's envs' regions????? ****
 exr_key = '0000000' # Azure ExpressRoute service key
 
 
@@ -144,7 +143,7 @@ api_response = requests.post(skytap_url('wan')
                              auth=auth,
                              params={
                                 'name': exr_name,
-                                'region': exr_region,
+                                'region': env_region,
                                 'connection-managed-by': 'customer',
                                 'service_key': exr_servicekey,
                                 'local_peer_ip': public_ip_id,
@@ -157,9 +156,13 @@ api_response = requests.post(skytap_url('wan')
                                 'dpd_enabled': 'false',
                                 'route_based': 'false',
                                 'sa_policy_level': 'null'
-                             })
+                                }
+                            )
 http_status(api_response)
 print_response(api_response, 'exr_id', 'ExpressRoute connection')
 
+## Function to connect envs to ExpressRoute + enable ExpressRoute
+
 
 ## (?) do we want to send a GET request at the end for user to look at their new configurations?
+#   --> incorporate URL that takes to Skytap interface
