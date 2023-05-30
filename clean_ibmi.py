@@ -2,7 +2,6 @@ import requests
 import json
 
 
-
 ## User's variables
 '''
 You will need to define the following variables prior to creating your landing zone. 
@@ -83,4 +82,26 @@ print(json.dumps(json_output, indent = 4))
 
 json_data = api_response.json() if api_response and api_response.status_code== 200 else None
 env_id = json_data['id'] if json_data and 'id' in json_data else None
-print('Environment ID: %s' % env_id)
+print('environment_ID = %s' % env_id)
+
+
+## Add LPARs/VMs to environment
+# LAPR/VM 1
+api_response = requests.put(skytap_url('environment', env_id), 
+                            headers=headers,
+                            auth=auth,
+                            params={
+                                 'template_id': vm_template
+                             })
+
+print("HTTP status_code = %s" % api_response.status_code)
+
+# LPAR/VM 2
+api_response = requests.put(skytap_url('environment', env_id),
+                            headers=headers,
+                            auth=auth,
+                            params={
+                                'template_id': vm_template
+                            })
+
+print("HTTP status_code = %s" % api_response.status_code)
