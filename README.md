@@ -31,3 +31,9 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
     - US-Texas-M-1
     - US-Virginia-M-1
     - US-West
+
+# link to documentation of API v1
+--> https://help.skytap.com/API_Documentation.html#top
+
+# blurb on where it can be run--Azure account using cloudShell
+--> upload script from file: https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files

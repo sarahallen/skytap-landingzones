@@ -16,7 +16,6 @@ env_name = 'Sample Name' # Assign preferred name to your new environment
 vm_template = '0000000' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-# ^ (?) does not get used in this scripted case, should it??????
 exr_name = '' # Assign preferred name to ExpressRoute circuit
 exr_key = '0000000' # Azure ExpressRoute service key
 
@@ -135,19 +134,20 @@ api_response = requests.post(skytap_url('ip_address'),
                              })
 http_status(api_response)
 print_response(api_response, 'public_ip_id', 'public IP')
+public_ip_id = api_response.json()['id']
 
 
 ## Add ExpressRoute in same region as environment
-api_response = requests.post(skytap_url('wan')
+api_response = requests.post(skytap_url('wan'),
                              headers=headers,
                              auth=auth,
                              params={
                                 'name': exr_name,
                                 'region': env_region,
                                 'connection-managed-by': 'customer',
-                                'service_key': exr_servicekey,
+                                'service_key': exr_key,
                                 'local_peer_ip': public_ip_id,
-                                "local_subnet": env_subnet,
+                                'local_subnet': env_subnet,
                                 'nat_local_subnet': 'false',
                                 'connection_type': 'express_route',
                                 'phase_2_perfect_forward_secrecy': 'false',
@@ -156,8 +156,7 @@ api_response = requests.post(skytap_url('wan')
                                 'dpd_enabled': 'false',
                                 'route_based': 'false',
                                 'sa_policy_level': 'null'
-                                }
-                            )
+                                })
 http_status(api_response)
 print_response(api_response, 'exr_id', 'ExpressRoute connection')
 
@@ -165,4 +164,4 @@ print_response(api_response, 'exr_id', 'ExpressRoute connection')
 
 
 ## (?) do we want to send a GET request at the end for user to look at their new configurations?
-#   --> incorporate URL that takes to Skytap interface
+#   --> incorporate URL that takes to Skytap interface in GET response
