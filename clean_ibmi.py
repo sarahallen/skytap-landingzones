@@ -67,6 +67,7 @@ def skytap_url(type, env_id=''):
 'https://cloud.skytap.com/vpns.json' --> WAN resources
     - Create new ExpressRoute
 '''
+
 def http_status(response):
     return 'HTTP status_code = %s' % response.status_code
     ## (?) Do we want this to return a description of the successfull operation at all or just the code?
@@ -161,3 +162,4 @@ http_status(api_response)
 print_response(api_response, 'exr_id', 'ExpressRoute connection')
 
 
+## (?) do we want to send a GET request at the end for user to look at their new configurations?
