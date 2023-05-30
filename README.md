@@ -1,4 +1,4 @@
-#### Skytap Landing Zones ####
+# Skytap Landing Zones #
 Get started with Skytap Environment creation using the Rest API.
 
 These scripts use Skytap Python REST API v1 to perform the following operations:
@@ -9,13 +9,13 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
     - Acquire a public IP for account.
     - Add an ExpressRoute circuit WAN to environment. 
 
-### Pre-Requisites: ###
+## Pre-Requisites: ##
     - An active Skytap account or Skytap on Azure services. 
     - Skytap account email address or Skytap on Azure auto-generated email address. 
     - Skytap REST API key or Skytap account password.
     - An active Azure ExpressRoute service key. 
 
-# Skytap Regions
+### Skytap Regions ###
     - APAC-2
     - AU-Sydney-I-1
     - CAN-Toronto
