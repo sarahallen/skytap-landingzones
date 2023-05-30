@@ -69,6 +69,7 @@ def skytap_url(type, env_id=''):
 '''
 def http_status(response):
     return 'HTTP status_code = %s' % response.status_code
+    ## (?) Do we want this to return a description of the successfull operation at all or just the code?
 
 def print_response(response, variable, operation):
     if response and response.status_code == 200:
