@@ -17,8 +17,9 @@ vm_template = '0000000' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 # ^ (?) does not get used in this scripted case, should it??????
-exr_key = '0000000' # Azure ExpressRoute service key
+exr_name = '' # Assign preferred name to ExpressRoute circuit
 exr_region = '' # (?) same as Skytap's envs' regions????? ****
+exr_key = '0000000' # Azure ExpressRoute service key
 
 
 ## Constants
@@ -50,7 +51,7 @@ def skytap_url(type, env_id=''):
         return url + 'vpns.json'
     
     else:
-        raise('Must specify type of operation to continue.')
+        raise('Must specify a valid type of operation to continue.')
 
 '''
 'https://cloud.skytap.com/configurations.json' --> all environments
@@ -66,6 +67,17 @@ def skytap_url(type, env_id=''):
 'https://cloud.skytap.com/vpns.json' --> WAN resources
     - Create new ExpressRoute
 '''
+def http_status(response):
+    return 'HTTP status_code = %s' % response.status_code
+
+def print_response(response, variable, operation):
+    if response and response.status_code == 200:
+        data = response.json()
+        id = data['id']
+        return f'{variable} = {id}'
+    
+    else:
+        return f'Unable to create {operation}'
 
 
 ## Create a new environment
@@ -76,14 +88,10 @@ api_response = requests.post(skytap_url('configurations'),
                                  'template_id': env_template,
                                  'name': env_name,
                              })
-
-print('HTTP status_code = %s' % api_response.status_code)
+http_status(api_response)
 json_output = json.loads(api_response.text)
 print(json.dumps(json_output, indent = 4))
-
-json_data = api_response.json() if api_response and api_response.status_code== 200 else None
-env_id = json_data['id'] if json_data and 'id' in json_data else None
-print('environment_ID = %s' % env_id)
+print_response(api_response, 'environment_id', 'environment')
 
 
 ## Add LPARs/VMs to environment
@@ -94,8 +102,7 @@ api_response = requests.put(skytap_url('environment', env_id),
                             params={
                                  'template_id': vm_template
                              })
-
-print("HTTP status_code = %s" % api_response.status_code)
+http_status(api_response)
 
 # LPAR/VM 2
 api_response = requests.put(skytap_url('environment', env_id),
@@ -104,8 +111,7 @@ api_response = requests.put(skytap_url('environment', env_id),
                             params={
                                 'template_id': vm_template
                             })
-
-print("HTTP status_code = %s" % api_response.status_code)
+http_status(api_response)
 
 
 ## Configure environment network
@@ -115,8 +121,7 @@ api_response = requests.put(skytap_url('environment', env_id),
                             params={
                                 'subnet': env_subnet
                             })
-
-print("HTTP status_code = %s" % api_response.status_code)
+http_status(api_response)
 
 
 ## Acquire public IP in same region as environment
@@ -126,9 +131,31 @@ api_response = requests.post(skytap_url('ip_address'),
                              params={
                                  'region': env_region
                              })
+http_status(api_response)
+print_response(api_response, 'public_ip_id', 'public IP')
 
 
-json_data = api_response.json() if api_response and api_response.status_code== 200 else print("Unable to create public IP. Revise account limits.")
-public_ip_id = json_data["id"] if json_data and 'id' in json_data else None
-print('public_ip_id = %s' % public_ip_id) if public_ip_id else None
+## Add ExpressRoute in same region as environment
+api_response = requests.post(skytap_url('wan')
+                             headers=headers,
+                             auth=auth,
+                             params={
+                                'name': exr_name,
+                                'region': exr_region,
+                                'connection-managed-by': 'customer',
+                                'service_key': exr_servicekey,
+                                'local_peer_ip': public_ip_id,
+                                "local_subnet": env_subnet,
+                                'nat_local_subnet': 'false',
+                                'connection_type': 'express_route',
+                                'phase_2_perfect_forward_secrecy': 'false',
+                                'specify_maximum_segment_size': 'false',
+                                'maximum_segment_size': 'null',
+                                'dpd_enabled': 'false',
+                                'route_based': 'false',
+                                'sa_policy_level': 'null'
+                             })
+http_status(api_response)
+print_response(api_response, 'exr_id', 'ExpressRoute connection')
+
 
