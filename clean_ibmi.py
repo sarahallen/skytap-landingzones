@@ -92,11 +92,11 @@ http_status(api_response)
 json_output = json.loads(api_response.text)
 print(json.dumps(json_output, indent = 4))
 print_response(api_response, 'environment_id', 'environment')
+env_id = api_response.json()['id']
 
 
 ## Add LPARs/VMs to environment
 # LAPR/VM 1
-env_id = api_response.json()['id']
 api_response = requests.put(skytap_url('environment', env_id), 
                             headers=headers,
                             auth=auth,

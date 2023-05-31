@@ -15,6 +15,14 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
 * Skytap REST API key or Skytap account password.
 * An active Azure ExpressRoute service key. 
 
+## How to run this script ##
+We recommend running this script in you Azure account's PowerShell. 
+--> (?) Are we to only run this script after running Poom's ARM/Bicep templates? (?) <--
+
+You can clone this repo, save it to your machine, then upload the script to your
+Azure account's PowerShell. For a more detailed set of steps, follow:
+https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files
+
 ### Skytap Regions ###
     - APAC-2
     - AU-Sydney-I-1
@@ -32,8 +40,5 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
     - US-Virginia-M-1
     - US-West
 
-# link to documentation of API v1
---> https://help.skytap.com/API_Documentation.html#top
-
-# blurb on where it can be run--Azure account using cloudShell
---> upload script from file: https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files
+#### Skytap REST API v1 documentation:
+https://help.skytap.com/API_Documentation.html#top
