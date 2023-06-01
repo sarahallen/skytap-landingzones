@@ -1,0 +1,2 @@
+# Ignore test scenario #1 (includes private credentials)
+test_template1.py

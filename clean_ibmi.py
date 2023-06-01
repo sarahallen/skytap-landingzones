@@ -8,17 +8,17 @@ You will need to define the following variables prior to creating your landing z
 Please gather and fill in all your information prior to running your script.
 ** input all as strings ** 
 '''
-user_account = 'sarahallen@skytap.com_5826' # Skytap user account
-API_key = '5ab1633066ee7bef2fe4fc7372e01713b0e4f71e' # API key or user account password
-env_region = 'US-Texas-M-1' # Insert region name of your landing zone (see README)
-env_template = '2110325' # Insert region-based environment template ID
-env_name = 'Test-Env-Ihovanna' # Assign preferred name to your new environment
-vm1_template = '2110325' # Insert region-based VM template ID
-vm2_template = '2111381' # Insert region-based VM template ID
+user_account = 'account@skytap.com' # Skytap user account
+API_key = '0000000' # API key or user account password
+env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
+env_template = '0000000' # Insert region-based environment template ID
+env_name = 'Sample Name' # Assign preferred name to your new environment
+vm1_template = '0000000' # Insert region-based VM template ID
+vm2_template = '0000000' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
-exr_key = '9521a609-27ec-4aae-8388-9921807d82d8' # Azure ExpressRoute service key
+exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
+exr_key = '0000000' # Azure ExpressRoute service key
 
 
 ## Constants
@@ -163,8 +163,32 @@ exr_id = id_str(api_response, 'ExpressRoute connection')
 print('exr_id = %s' % exr_id)
 
 
-## Function to connect envs to ExpressRoute + enable ExpressRoute
-# attach then connect the environment network to the WAN
+## Attach network to private network connection
+'''
+POST
+https://cloud.skytap.com/configurations/{configuration-id}/networks/{network-id}/vpns.json
+
+params = {
+    "vpn_id": "vpn-12345"
+}
+'''
+
+
+## Connect environment's network to ExpressRoute/WAN
+'''
+PUT 
+https://cloud.skytap.com/configurations/{configuration-id}/networks/{network-id}/vpns/{vpn-id}.json
+
+params = {
+    "connected": true
+}
+'''
+
+
+## Enable ExpressRoute
+
+
+
 # https://help.skytap.com/API_Documentation.html#Network
 # https://help.skytap.com/wan-connecting-environments.html
 
