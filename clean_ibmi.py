@@ -50,7 +50,7 @@ def skytap_url(type, env_id=''):
         return url + 'vpns.json'
     
     else:
-        raise('Must specify a valid type of operation to continue.')
+        raise TypeError('Must specify a valid type of operation to continue.')
 
 '''
 'https://cloud.skytap.com/configurations.json' --> all environments
@@ -77,7 +77,7 @@ def id_str(response, operation):
         return str(data['id'])
     
     else:
-        return f'Unable to create {operation}'
+        raise RuntimeError(f'Unable to create {operation}')
 
 
 ## Create a new environment

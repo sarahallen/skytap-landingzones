@@ -14,6 +14,7 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
 * Skytap account email address or Skytap on Azure auto-generated email address. 
 * Skytap REST API key or Skytap account password.
 * An active Azure ExpressRoute service key. 
+* May need to install `requests` library.
 
 ## How to run this script ##
 We recommend running this script in you Azure account's PowerShell. 
