@@ -8,16 +8,17 @@ You will need to define the following variables prior to creating your landing z
 Please gather and fill in all your information prior to running your script.
 ** input all as strings ** 
 '''
-user_account = 'account@skytap.com' # Skytap user account
-API_key = '0000000' # API key or user account password
-env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
-env_template = '0000000' # Insert region-based environment template ID
-env_name = 'Sample Name' # Assign preferred name to your new environment
-vm_template = '0000000' # Insert region-based VM template ID
+user_account = 'sarahallen@skytap.com_5826' # Skytap user account
+API_key = '5ab1633066ee7bef2fe4fc7372e01713b0e4f71e' # API key or user account password
+env_region = 'US-Texas-M-1' # Insert region name of your landing zone (see README)
+env_template = '2110325' # Insert region-based environment template ID
+env_name = 'Test-Env-Ihovanna' # Assign preferred name to your new environment
+vm1_template = '2110325' # Insert region-based VM template ID
+vm2_template = '2111381' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
-exr_key = '0000000' # Azure ExpressRoute service key
+exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
+exr_key = '9521a609-27ec-4aae-8388-9921807d82d8' # Azure ExpressRoute service key
 
 
 ## Constants
@@ -70,11 +71,10 @@ def http_status(response):
     return 'HTTP status_code = %s' % response.status_code
     ## (?) Do we want this to return a description of the successfull operation at all or just the code?
 
-def print_response(response, variable, operation):
+def id_str(response, operation):
     if response and response.status_code == 200:
         data = response.json()
-        id = data['id']
-        return f'{variable} = {id}'
+        return str(data['id'])
     
     else:
         return f'Unable to create {operation}'
@@ -91,8 +91,9 @@ api_response = requests.post(skytap_url('configurations'),
 http_status(api_response)
 json_output = json.loads(api_response.text)
 print(json.dumps(json_output, indent = 4))
-print_response(api_response, 'environment_id', 'environment')
-env_id = api_response.json()['id']
+
+env_id = id_str(api_response, 'environment')
+print('environment_id = %s' % env_id)
 
 
 ## Add LPARs/VMs to environment
@@ -101,7 +102,7 @@ api_response = requests.put(skytap_url('environment', env_id),
                             headers=headers,
                             auth=auth,
                             params={
-                                 'template_id': vm_template
+                                 'template_id': vm1_template
                              })
 http_status(api_response)
 
@@ -110,7 +111,7 @@ api_response = requests.put(skytap_url('environment', env_id),
                             headers=headers,
                             auth=auth,
                             params={
-                                'template_id': vm_template
+                                'template_id': vm2_template
                             })
 http_status(api_response)
 
@@ -133,8 +134,8 @@ api_response = requests.post(skytap_url('ip_address'),
                                  'region': env_region
                              })
 http_status(api_response)
-print_response(api_response, 'public_ip_id', 'public IP')
-public_ip_id = api_response.json()['id']
+public_ip_id = id_str(api_response, 'public IP')
+print('public_ip_id = %s' % public_ip_id)
 
 
 ## Add ExpressRoute in same region as environment
@@ -158,10 +159,14 @@ api_response = requests.post(skytap_url('wan'),
                                 'sa_policy_level': 'null'
                                 })
 http_status(api_response)
-print_response(api_response, 'exr_id', 'ExpressRoute connection')
+exr_id = id_str(api_response, 'ExpressRoute connection')
+print('exr_id = %s' % exr_id)
+
 
 ## Function to connect envs to ExpressRoute + enable ExpressRoute
-
+# attach then connect the environment network to the WAN
+# https://help.skytap.com/API_Documentation.html#Network
+# https://help.skytap.com/wan-connecting-environments.html
 
 ## (?) do we want to send a GET request at the end for user to look at their new configurations?
 #   --> incorporate URL that takes to Skytap interface in GET response
