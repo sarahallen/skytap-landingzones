@@ -31,7 +31,7 @@ url = 'https://cloud.skytap.com/'
 auth = (user_account, API_key)
 headers = { 'Accept': 'application/json', 'Content-type': 'application/json'}
 
-def skytap_url(type, env_id=''):
+def skytap_url(type, env_id='', network_id='', exr_id=''):
     # To create new environments
     if type == 'configurations':
         return url + 'configurations.json'
@@ -49,6 +49,14 @@ def skytap_url(type, env_id=''):
     elif type == 'wan':
         return url + 'vpns.json'
     
+    # To attach environment's network to ExpressRoute
+    elif type == '':
+        return url + f'configurations/{env_id}/networks/{network_id}/vpns.json'
+
+    # To connect environment's network to ExpressRoute
+    elif type == 'exr':
+        return url + f'configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json'
+
     else:
         raise TypeError('Must specify a valid type of operation to continue.')
 
@@ -65,6 +73,12 @@ def skytap_url(type, env_id=''):
 
 'https://cloud.skytap.com/vpns.json' --> WAN resources
     - Create new ExpressRoute
+
+'https://cloud.skytap.com/configurations/{env-id}/networks/{network-id}/vpns.json' --> WANs within network
+    - Attach network to ExpressRoute
+
+'https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json' --> ExpressRoute WAN
+    - Connect environment's network to ExpressRoute
 '''
 
 def http_status(response):
@@ -166,7 +180,7 @@ print('exr_id = %s' % exr_id)
 ## Attach network to private network connection
 '''
 POST
-https://cloud.skytap.com/configurations/{configuration-id}/networks/{network-id}/vpns.json
+https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns.json
 
 params = {
     "vpn_id": "vpn-12345"
@@ -177,7 +191,7 @@ params = {
 ## Connect environment's network to ExpressRoute/WAN
 '''
 PUT 
-https://cloud.skytap.com/configurations/{configuration-id}/networks/{network-id}/vpns/{vpn-id}.json
+https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json
 
 params = {
     "connected": true
