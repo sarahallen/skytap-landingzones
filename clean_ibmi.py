@@ -50,7 +50,7 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
         return url + 'vpns.json'
     
     # To attach environment's network to ExpressRoute
-    elif type == '':
+    elif type == 'network':
         return url + f'configurations/{env_id}/networks/{network_id}/vpns.json'
 
     # To connect environment's network to ExpressRoute
