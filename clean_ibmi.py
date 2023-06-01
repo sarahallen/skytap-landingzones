@@ -182,8 +182,10 @@ print('exr_id = %s' % exr_id)
 api_response = requests.post(skytap_url('network', env_id=env_id, network_id=network_id),
                              auth=auth,
                              params={
-                                 'vpn_id': ''
+                                 'vpn_id': 'exr_id'
                              })
+http_status(api_response)
+
 '''
 POST
 https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns.json
