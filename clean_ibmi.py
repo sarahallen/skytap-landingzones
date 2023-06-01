@@ -19,6 +19,7 @@ env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
 exr_key = '0000000' # Azure ExpressRoute service key
+remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 
 ## Constants
@@ -48,6 +49,10 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
     # To create WANs/Azure ExpressRoute
     elif type == 'wan':
         return url + 'vpns.json'
+    
+    # To include remote subnet
+    elif type == 'subnet':
+        return url+ f'vpns/{exr_id}/subnets.json'
     
     # To attach environment's network to ExpressRoute
     elif type == 'network':
@@ -187,6 +192,14 @@ api_response = requests.post(skytap_url('network', env_id=env_id, network_id=net
 http_status(api_response)
 
 
+## Include remote subnet
+api_response = requests.post(skytap_url('subnet', exr_id=exr_id),
+                             auth=auth,
+                             params={
+                                 'cidr_block': remote_subnet
+                             })
+
+
 ## Connect environment's network to ExpressRoute/WAN
 api_response = requests.put(skytap_url('exr',env_id=env_id, network_id=network_id, exr_id=exr_id),
                             auth=auth,
@@ -195,14 +208,13 @@ api_response = requests.put(skytap_url('exr',env_id=env_id, network_id=network_i
                             })
 http_status(api_response)
 
+# add remote subnets
 
 
 ## Enable ExpressRoute
 
 
 
-# https://help.skytap.com/API_Documentation.html#Network
-# https://help.skytap.com/wan-connecting-environments.html
 
 ## (?) do we want to send a GET request at the end for user to look at their new configurations?
 #   --> incorporate URL that takes to Skytap interface in GET response
