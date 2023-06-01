@@ -186,25 +186,15 @@ api_response = requests.post(skytap_url('network', env_id=env_id, network_id=net
                              })
 http_status(api_response)
 
-'''
-POST
-https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns.json
-
-params = {
-    "vpn_id": "vpn-12345"
-}
-'''
-
 
 ## Connect environment's network to ExpressRoute/WAN
-'''
-PUT 
-https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json
+api_response = requests.put(skytap_url('exr',env_id=env_id, network_id=network_id, exr_id=exr_id),
+                            auth=auth,
+                            params={
+                                'connected': True
+                            })
+http_status(api_response)
 
-params = {
-    "connected": true
-}
-'''
 
 
 ## Enable ExpressRoute
