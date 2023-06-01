@@ -112,7 +112,7 @@ print('environment_id = %s' % env_id)
 
 ## Add LPARs/VMs to environment
 # LAPR/VM 1
-api_response = requests.put(skytap_url('environment', env_id), 
+api_response = requests.put(skytap_url('environment', env_id=env_id), 
                             headers=headers,
                             auth=auth,
                             params={
@@ -121,7 +121,7 @@ api_response = requests.put(skytap_url('environment', env_id),
 http_status(api_response)
 
 # LPAR/VM 2
-api_response = requests.put(skytap_url('environment', env_id),
+api_response = requests.put(skytap_url('environment', env_id=env_id),
                             headers=headers,
                             auth=auth,
                             params={
@@ -131,13 +131,14 @@ http_status(api_response)
 
 
 ## Configure environment network
-api_response = requests.put(skytap_url('environment', env_id),
+api_response = requests.put(skytap_url('environment', env_id=env_id),
                             headers=headers,
                             auth=auth,
                             params={
                                 'subnet': env_subnet
                             })
 http_status(api_response)
+network_id = api_response['id']
 
 
 ## Acquire public IP in same region as environment
@@ -178,6 +179,11 @@ print('exr_id = %s' % exr_id)
 
 
 ## Attach network to private network connection
+api_response = requests.post(skytap_url('network', env_id=env_id, network_id=network_id),
+                             auth=auth,
+                             params={
+                                 'vpn_id': ''
+                             })
 '''
 POST
 https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns.json
