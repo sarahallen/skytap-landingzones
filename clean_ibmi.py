@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 
 ## User's variables
@@ -8,19 +9,30 @@ You will need to define the following variables prior to creating your landing z
 Please gather and fill in all your information prior to running your script.
 ** input all as strings ** 
 '''
-user_account = 'account@skytap.com' # Skytap user account
-API_key = '0000000' # API key or user account password
-env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
-env_template = '0000000' # Insert region-based environment template ID
-env_name = 'Sample Name' # Assign preferred name to your new environment
-vm1_template = '0000000' # Insert region-based VM template ID
-vm2_template = '0000000' # Insert region-based VM template ID
+# user_account = 'account@skytap.com' # Skytap user account
+# API_key = '0000000' # API key or user account password
+# env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
+# env_template = '0000000' # Insert region-based environment template ID
+# env_name = 'Sample Name' # Assign preferred name to your new environment
+# vm1_template = '0000000' # Insert region-based VM template ID
+# vm2_template = '0000000' # Insert region-based VM template ID
+# env_subnet = '10.0.0.0/24' # Define network subnet address range
+# env_gateway = '10.0.0.254' # Define network gateway IPv4 address
+# exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
+# exr_key = '0000000' # Azure ExpressRoute service key
+# remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
+
+user_account = 'sarah_admin' # Skytap user account
+API_key = 'ad61e8a4a1ecca7211c5f6f27f4136d13890a2fe' # API key or user account password
+env_region = 'US-Texas-M-1' # Insert region name of your landing zone (see README)
+env_template = '2110325' # Insert region-based environment template ID
+env_name = 'Test-Env-Ihovanna' # Assign preferred name to your new environment
+vm1_template = '2110325' # Insert region-based VM template ID
+vm2_template = '2111381' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
-exr_key = '0000000' # Azure ExpressRoute service key
-remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
-
+exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
+exr_key = '9521a609-27ec-4aae-8388-9921807d82d8' # Azure ExpressRoute service key
 
 ## Constants
 '''
@@ -50,16 +62,20 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
     elif type == 'wan':
         return url + 'vpns.json'
     
+    # To enable ExpressRoute
+    elif type == 'temp_name':
+        return url + f'vpns/{exr_id}'
+
     # To include remote subnet
     elif type == 'subnet':
         return url+ f'vpns/{exr_id}/subnets.json'
     
     # To attach environment's network to ExpressRoute
-    elif type == 'network':
+    elif type == 'network': # env_network
         return url + f'configurations/{env_id}/networks/{network_id}/vpns.json'
 
     # To connect environment's network to ExpressRoute
-    elif type == 'exr':
+    elif type == 'exr': # env_network_exr
         return url + f'configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json'
 
     else:
@@ -134,6 +150,36 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             })
 http_status(api_response)
 
+## Check for busyness
+# --> busyness function at top constants
+# we have to check if all different URLs are busy
+'''
+-check if environment is busy
+-change network on environment
+-check if network is busy
+-attach environment network to EXR/VPN/WAN
+-check if EXR/VPN/WAN is busy
+-connect environment network to EXR/VPN/WAN
+'''
+
+skytap_url = ''
+def busyness(skytap_url):
+    i = 0
+    check = get_env()
+
+    while i is not 3 and check['busy'] is not None:
+        print('busy loop')
+        i += 1
+        check = get_env()
+        time.sleep(3)
+        
+        return check
+
+def get_env():
+    return requests.get(skytap_url('configurations'),
+                             headers=headers,
+                             auth=auth,
+                             )
 
 ## Configure environment network
 api_response = requests.put(skytap_url('environment', env_id=env_id),
@@ -201,20 +247,28 @@ api_response = requests.post(skytap_url('subnet', exr_id=exr_id),
 
 
 ## Connect environment's network to ExpressRoute/WAN
-api_response = requests.put(skytap_url('exr',env_id=env_id, network_id=network_id, exr_id=exr_id),
+api_response = requests.put(skytap_url('exr', env_id=env_id, network_id=network_id, exr_id=exr_id),
                             auth=auth,
                             params={
                                 'connected': True
                             })
 http_status(api_response)
 
-# add remote subnets
-
 
 ## Enable ExpressRoute
-
+api_response = requests.put(skytap_url('temp_name', exr_id=exr_id),
+                            auth=auth,
+                            params={
+                                'enabled': True
+                            })
 
 
 
 ## (?) do we want to send a GET request at the end for user to look at their new configurations?
 #   --> incorporate URL that takes to Skytap interface in GET response
+
+
+# --> Function to check if environment is busy + 
+#       - we cannot make changes to network while it is busy
+#       - runstate field == "stopped" so you can proceed
+#       - retry command every 10 seconds
