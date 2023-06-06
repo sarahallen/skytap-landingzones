@@ -9,30 +9,17 @@ You will need to define the following variables prior to creating your landing z
 Please gather and fill in all your information prior to running your script.
 ** input all as strings ** 
 '''
-# user_account = 'account@skytap.com' # Skytap user account
-# API_key = '0000000' # API key or user account password
-# env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
-# env_template = '0000000' # Insert region-based environment template ID
-# env_name = 'Sample Name' # Assign preferred name to your new environment
-# vm1_template = '0000000' # Insert region-based VM template ID
-# vm2_template = '0000000' # Insert region-based VM template ID
-# env_subnet = '10.0.0.0/24' # Define network subnet address range
-# env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-# exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
-# exr_key = '0000000' # Azure ExpressRoute service key
-# remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
-
-user_account = 'sarah_admin' # Skytap user account
-API_key = 'ad61e8a4a1ecca7211c5f6f27f4136d13890a2fe' # API key or user account password
-env_region = 'US-Texas-M-1' # Insert region name of your landing zone (see README)
-env_template = '2110325' # Insert region-based environment template ID
-env_name = 'Test-Env-Ihovanna' # Assign preferred name to your new environment
-vm1_template = '2110325' # Insert region-based VM template ID
-vm2_template = '2111381' # Insert region-based VM template ID
+user_account = 'account@skytap.com' # Skytap user account
+API_key = '0000000' # API key or user account password
+env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
+env_template = '0000000' # Insert region-based environment template ID
+env_name = 'Sample Name' # Assign preferred name to your new environment
+vm1_template = '0000000' # Insert region-based VM template ID
+vm2_template = '0000000' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
-exr_key = '9521a609-27ec-4aae-8388-9921807d82d8' # Azure ExpressRoute service key
+exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
+exr_key = '0000000' # Azure ExpressRoute service key
 remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 ## Constants
@@ -72,11 +59,11 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
         return url+ f'vpns/{exr_id}/subnets.json'
     
     # To attach environment's network to ExpressRoute
-    elif type == 'network': # env_network
+    elif type == 'env_network':
         return url + f'configurations/{env_id}/networks/{network_id}/vpns.json'
 
     # To connect environment's network to ExpressRoute
-    elif type == 'exr': # env_network_exr
+    elif type == 'env_network_exr':
         return url + f'configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json'
 
     else:
@@ -239,7 +226,7 @@ print('exr_id = %s' % exr_id)
 
 
 ## Attach network to private network connection
-api_response = requests.post(skytap_url('network', env_id=env_id, network_id=network_id),
+api_response = requests.post(skytap_url('env_network', env_id=env_id, network_id=network_id),
                              auth=auth,
                              params={
                                  'vpn_id': exr_id
@@ -258,7 +245,7 @@ busyness(env_id)
 print(http_status('Include remote subnet', api_response))
 
 ## Connect environment's network to ExpressRoute/WAN
-api_response = requests.put(skytap_url('exr', env_id=env_id, network_id=network_id, exr_id=exr_id),
+api_response = requests.put(skytap_url('env_network_exr', env_id=env_id, network_id=network_id, exr_id=exr_id),
                             auth=auth,
                             params={
                                 'connected': True
