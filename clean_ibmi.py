@@ -33,6 +33,7 @@ env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
 exr_key = '9521a609-27ec-4aae-8388-9921807d82d8' # Azure ExpressRoute service key
+remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 ## Constants
 '''
@@ -102,9 +103,9 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
     - Connect environment's network to ExpressRoute
 '''
 
-def http_status(response):
-    return 'HTTP status_code = %s' % response.status_code
-    ## (?) Do we want this to return a description of the successfull operation at all or just the code?
+def http_status(operation, response):
+    return '%s status_code = %s' % (operation, response.status_code)
+
 
 def id_str(response, operation):
     if response and response.status_code == 200:
@@ -117,7 +118,7 @@ def id_str(response, operation):
 def get_env(environment):
     return requests.get(skytap_url('environment', environment),
                              headers=headers,
-                             auth=auth,
+                             auth=auth
                              )
 
 def busyness(environment):
@@ -143,7 +144,7 @@ api_response = requests.post(skytap_url('configurations'),
                                  'template_id': env_template,
                                  'name': env_name,
                              })
-http_status(api_response)
+print(http_status('Create new environment', api_response))
 json_output = json.loads(api_response.text)
 print(json.dumps(json_output, indent = 4))
 
@@ -162,7 +163,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                                  'template_id': vm1_template
                              })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Create new VM/LPAR #1', api_response))
 
 # LPAR/VM 2
 api_response = requests.put(skytap_url('environment', env_id=env_id),
@@ -172,13 +173,13 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                                 'template_id': vm2_template
                             })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Create new VM/LPAR #2', api_response))
 
 
 # code runs up to creating an environment and does not proceed to create VMs
 # it did; it did not change network!
 '''
-[] check if environment is busy
+[*] check if environment is busy
 [*]change network on environment
 [] check if network is busy
 [*]attach environment network to EXR/VPN/WAN
@@ -194,7 +195,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                                 'subnet': env_subnet
                             })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Configure environment network', api_response))
 network_id = api_response['id']
 
 
@@ -206,7 +207,7 @@ api_response = requests.post(skytap_url('ip_address'),
                                  'region': env_region
                              })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Acquire public IP', api_response))
 public_ip_id = id_str(api_response, 'public IP')
 print('public_ip_id = %s' % public_ip_id)
 
@@ -232,7 +233,7 @@ api_response = requests.post(skytap_url('wan'),
                                 'sa_policy_level': 'null'
                                 })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Add ExpressRoute', api_response))
 exr_id = id_str(api_response, 'ExpressRoute connection')
 print('exr_id = %s' % exr_id)
 
@@ -244,7 +245,7 @@ api_response = requests.post(skytap_url('network', env_id=env_id, network_id=net
                                  'vpn_id': exr_id
                              })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Attach network to ExpressRoute', api_response))
 
 
 ## Include remote subnet
@@ -254,7 +255,7 @@ api_response = requests.post(skytap_url('subnet', exr_id=exr_id),
                                  'cidr_block': remote_subnet
                              })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Include remote subnet', api_response))
 
 ## Connect environment's network to ExpressRoute/WAN
 api_response = requests.put(skytap_url('exr', env_id=env_id, network_id=network_id, exr_id=exr_id),
@@ -263,7 +264,7 @@ api_response = requests.put(skytap_url('exr', env_id=env_id, network_id=network_
                                 'connected': True
                             })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Connect network to ExpressRoute', api_response))
 
 
 ## Enable ExpressRoute
@@ -273,7 +274,7 @@ api_response = requests.put(skytap_url('temp_name', exr_id=exr_id),
                                 'enabled': True
                             })
 busyness(env_id)
-http_status(api_response)
+print(http_status('Enable ExpressRoute', api_response))
 
 
 
