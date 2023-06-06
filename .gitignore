@@ -1,4 +1,14 @@
-# Ignore test scenario #1 (includes private credentials)
+# Ignore test scenario #1 
 test_scenario1.py
+
+# Ignore test scenario #2 
 test_scenario2.py
-busyness.js
+
+# Ignore test scenario #3 
+test_scenario3.py
+
+# Ignore Randy C.'s JS code reference
+busyness.java
+
+# Ignore Ihovanna's playground
+misc.py

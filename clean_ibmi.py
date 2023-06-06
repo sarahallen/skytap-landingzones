@@ -114,6 +114,26 @@ def id_str(response, operation):
     else:
         raise RuntimeError(f'Unable to create {operation}')
 
+def get_env(environment):
+    return requests.get(skytap_url('environment', environment),
+                             headers=headers,
+                             auth=auth,
+                             )
+
+def busyness(environment):
+    # Checks environment runstate status every 3 seconds.
+    check = json.loads(get_env(environment).text)
+
+    while check['runstate'] == 'busy':
+        print('waiting on environment runstate status to proceed...')
+        time.sleep(3)
+        check = json.loads(get_env(environment).text)
+        
+    return check
+    
+# add after every VM creation (env will be busy after each of these)
+# when it comes back as 'stopped', then we can change network
+
 
 ## Create a new environment
 api_response = requests.post(skytap_url('configurations'),
@@ -128,7 +148,9 @@ json_output = json.loads(api_response.text)
 print(json.dumps(json_output, indent = 4))
 
 env_id = id_str(api_response, 'environment')
+busyness(env_id)
 print('environment_id = %s' % env_id)
+
 
 
 ## Add LPARs/VMs to environment
@@ -139,6 +161,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             params={
                                  'template_id': vm1_template
                              })
+busyness(env_id)
 http_status(api_response)
 
 # LPAR/VM 2
@@ -148,38 +171,20 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             params={
                                 'template_id': vm2_template
                             })
+busyness(env_id)
 http_status(api_response)
 
-## Check for busyness
-# --> busyness function at top constants
-# we have to check if all different URLs are busy
+
+# code runs up to creating an environment and does not proceed to create VMs
+# it did; it did not change network!
 '''
--check if environment is busy
--change network on environment
--check if network is busy
--attach environment network to EXR/VPN/WAN
--check if EXR/VPN/WAN is busy
--connect environment network to EXR/VPN/WAN
+[] check if environment is busy
+[*]change network on environment
+[] check if network is busy
+[*]attach environment network to EXR/VPN/WAN
+[] check if EXR/VPN/WAN is busy
+[*]connect environment network to EXR/VPN/WAN
 '''
-
-skytap_url = ''
-def busyness(skytap_url):
-    i = 0
-    check = get_env()
-
-    while i is not 3 and check['busy'] is not None:
-        print('busy loop')
-        i += 1
-        check = get_env()
-        time.sleep(3)
-        
-        return check
-
-def get_env():
-    return requests.get(skytap_url('configurations'),
-                             headers=headers,
-                             auth=auth,
-                             )
 
 ## Configure environment network
 api_response = requests.put(skytap_url('environment', env_id=env_id),
@@ -188,6 +193,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             params={
                                 'subnet': env_subnet
                             })
+busyness(env_id)
 http_status(api_response)
 network_id = api_response['id']
 
@@ -199,6 +205,7 @@ api_response = requests.post(skytap_url('ip_address'),
                              params={
                                  'region': env_region
                              })
+busyness(env_id)
 http_status(api_response)
 public_ip_id = id_str(api_response, 'public IP')
 print('public_ip_id = %s' % public_ip_id)
@@ -224,6 +231,7 @@ api_response = requests.post(skytap_url('wan'),
                                 'route_based': 'false',
                                 'sa_policy_level': 'null'
                                 })
+busyness(env_id)
 http_status(api_response)
 exr_id = id_str(api_response, 'ExpressRoute connection')
 print('exr_id = %s' % exr_id)
@@ -235,6 +243,7 @@ api_response = requests.post(skytap_url('network', env_id=env_id, network_id=net
                              params={
                                  'vpn_id': exr_id
                              })
+busyness(env_id)
 http_status(api_response)
 
 
@@ -244,7 +253,8 @@ api_response = requests.post(skytap_url('subnet', exr_id=exr_id),
                              params={
                                  'cidr_block': remote_subnet
                              })
-
+busyness(env_id)
+http_status(api_response)
 
 ## Connect environment's network to ExpressRoute/WAN
 api_response = requests.put(skytap_url('exr', env_id=env_id, network_id=network_id, exr_id=exr_id),
@@ -252,6 +262,7 @@ api_response = requests.put(skytap_url('exr', env_id=env_id, network_id=network_
                             params={
                                 'connected': True
                             })
+busyness(env_id)
 http_status(api_response)
 
 
@@ -261,14 +272,10 @@ api_response = requests.put(skytap_url('temp_name', exr_id=exr_id),
                             params={
                                 'enabled': True
                             })
+busyness(env_id)
+http_status(api_response)
 
 
 
 ## (?) do we want to send a GET request at the end for user to look at their new configurations?
 #   --> incorporate URL that takes to Skytap interface in GET response
-
-
-# --> Function to check if environment is busy + 
-#       - we cannot make changes to network while it is busy
-#       - runstate field == "stopped" so you can proceed
-#       - retry command every 10 seconds
