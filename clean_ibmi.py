@@ -140,7 +140,6 @@ busyness(env_id)
 print('environment_id = %s' % env_id)
 
 
-
 ## Add LPARs/VMs to environment
 # LAPR/VM 1
 api_response = requests.put(skytap_url('environment', env_id=env_id), 
@@ -162,9 +161,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
 busyness(env_id)
 print(http_status('Create new VM/LPAR #2', api_response))
 
-
-# code runs up to creating an environment and does not proceed to create VMs
-# it did; it did not change network!
+# code runs up to creating VMs, but did not modify network (runstate was busy)
 '''
 [*] check if environment is busy
 [*]change network on environment
@@ -173,6 +170,7 @@ print(http_status('Create new VM/LPAR #2', api_response))
 [] check if EXR/VPN/WAN is busy
 [*]connect environment network to EXR/VPN/WAN
 '''
+
 
 ## Configure environment network
 api_response = requests.put(skytap_url('environment', env_id=env_id),
@@ -243,6 +241,7 @@ api_response = requests.post(skytap_url('subnet', exr_id=exr_id),
                              })
 busyness(env_id)
 print(http_status('Include remote subnet', api_response))
+
 
 ## Connect environment's network to ExpressRoute/WAN
 api_response = requests.put(skytap_url('env_network_exr', env_id=env_id, network_id=network_id, exr_id=exr_id),
