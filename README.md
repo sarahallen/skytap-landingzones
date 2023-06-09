@@ -43,3 +43,24 @@ https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upl
 
 #### Skytap REST API v1 documentation:
 https://help.skytap.com/API_Documentation.html#top
+
+
+#### API Request endpoints utilized: ####
+'https://cloud.skytap.com/configurations.json' --> all environments
+    - Create an environment
+
+'https://cloud.skytap.com/configurations/{env_id}.json' --> within an env
+    - Create new LPARs and VMs
+    - Configure network
+
+'https://cloud.skytap.com/ips/acquire.json' --> IP addresses
+    - Generate an public IP address (???)
+
+'https://cloud.skytap.com/vpns.json' --> WAN resources
+    - Create new ExpressRoute
+
+'https://cloud.skytap.com/configurations/{env-id}/networks/{network-id}/vpns.json' --> WANs within network
+    - Attach network to ExpressRoute
+
+'https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json' --> ExpressRoute WAN
+    - Connect environment's network to ExpressRoute
