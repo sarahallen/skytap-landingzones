@@ -33,7 +33,7 @@ vm2_template = '2111381' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
-exr_key = '564d2745-1496-4766-956b-fc14172c78ab' # Azure ExpressRoute service key
+exr_key = '1f5333fe-f303-4316-898f-eb4fbe245e2c' # Azure ExpressRoute service key
 remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 ## Constants
@@ -123,26 +123,20 @@ def busyness(type, env_id='', network_id='', exr_id=''):
     elif type == 'vpn':
         check = json.loads(get_vpns(env_id, network_id,exr_id).text)
 
-        while check['pnc']['status'] != 'provisioned': #..or while != 'provisioned' (?)
-            if check['pnc']['status'] == 'error':
-                raise RuntimeError('ExpressRoute could not be provisioned')
+        ## check that 'pnc' exists, if not have it dump pretty json to see what it gives you.
+        if check['pnc']:
+            while check['pnc']['status'] != 'provisioned':
+                if check['pnc']['status'] == 'error':
+                    raise RuntimeError('ExpressRoute could not be provisioned')
 
-            print('waiting on ExpressRoute runstate status to proceed...')
-            time.sleep(3)
-            check = json.loads(get_vpns(env_id, network_id,exr_id).text)
+                print('waiting on ExpressRoute runstate status to proceed...')
+                time.sleep(3)
+                check = json.loads(get_vpns(env_id, network_id,exr_id).text)
+        else:
+            output = json.loads(get_vpns(env_id, network_id,exr_id).text)
+            return json.dumps(output, indent = 4)
     
     return check
-
-# def busyness(environment_id):
-#     # Checks environment runstate status every 3 seconds.
-#     check = json.loads(get_env(environment_id).text)
-
-#     while check['runstate'] == 'busy':
-#         print('waiting on environment runstate status to proceed...')
-#         time.sleep(3)
-#         check = json.loads(get_env(environment_id).text)
-        
-#     return check
 
 
 ## Create a new environment
