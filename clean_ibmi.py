@@ -33,7 +33,7 @@ vm2_template = '2111381' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
-exr_key = '54073233-e577-49eb-b5a9-52da6a779f2a' # Azure ExpressRoute service key
+exr_key = '564d2745-1496-4766-956b-fc14172c78ab' # Azure ExpressRoute service key
 remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 ## Constants
@@ -113,14 +113,6 @@ def get_vpns(env_id='', network_id='', exr_id=''):
 def busyness(type, env_id='', network_id='', exr_id=''):
     # Checks environment runstate status every 3 seconds.
     if type == 'environment':
-        check = json.loads(get_vpns(env_id, network_id,exr_id).text)
-
-        while check['pnc']['status'] == 'pending': #..or while != 'provisioned' (?)
-            print('waiting on ExpressRoute runstate status to proceed...')
-            time.sleep(3)
-            check = json.loads(get_vpns(env_id, network_id,exr_id).text)
-    
-    elif type == 'vpn':
         check = json.loads(get_env(env_id).text)
 
         while check['runstate'] == 'busy':
@@ -128,6 +120,17 @@ def busyness(type, env_id='', network_id='', exr_id=''):
             time.sleep(3)
             check = json.loads(get_env(env_id).text)
 
+    elif type == 'vpn':
+        check = json.loads(get_vpns(env_id, network_id,exr_id).text)
+
+        while check['pnc']['status'] != 'provisioned': #..or while != 'provisioned' (?)
+            if check['pnc']['status'] == 'error':
+                raise RuntimeError('ExpressRoute could not be provisioned')
+
+            print('waiting on ExpressRoute runstate status to proceed...')
+            time.sleep(3)
+            check = json.loads(get_vpns(env_id, network_id,exr_id).text)
+    
     return check
 
 # def busyness(environment_id):
@@ -155,7 +158,7 @@ json_output = json.loads(api_response.text)
 print(json.dumps(json_output, indent = 4))
 
 env_id = id_str(api_response, 'environment')
-busyness('environment', env_id)
+busyness('environment', env_id=env_id)
 print('environment_id = %s' % env_id)
 
 
@@ -167,7 +170,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             params={
                                  'template_id': vm1_template
                              })
-busyness('environment', env_id)
+busyness('environment', env_id=env_id)
 print(http_status('Create new VM/LPAR #1', api_response))
 
 # LPAR/VM 2
@@ -177,18 +180,8 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             params={
                                 'template_id': vm2_template
                             })
-busyness('environment', env_id)
+busyness('environment', env_id=env_id)
 print(http_status('Create new VM/LPAR #2', api_response))
-
-# code runs up to creating VMs, but did not modify network (runstate was busy)
-'''
-[*] check if environment is busy
-[*]change network on environment
-[] check if network is busy
-[*]attach environment network to EXR/VPN/WAN
-[] check if EXR/VPN/WAN is busy
-[*]connect environment network to EXR/VPN/WAN
-'''
 
 
 ## Configure environment network
@@ -198,7 +191,7 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             params={
                                 'subnet': env_subnet
                             })
-busyness('environment', env_id)
+busyness('environment', env_id=env_id)
 print(http_status('Configure environment network', api_response))
 network_id = api_response.json()['id']
 
@@ -210,7 +203,7 @@ api_response = requests.post(skytap_url('ip_address'),
                              params={
                                  'region': env_region
                              })
-busyness('environment', env_id)
+busyness('environment', env_id=env_id)
 print(http_status('Acquire public IP', api_response))
 public_ip_id = id_str(api_response, 'public IP')
 print('public_ip_id = %s' % public_ip_id)
@@ -236,7 +229,7 @@ api_response = requests.post(skytap_url('wan'),
                                 'route_based': 'false',
                                 'sa_policy_level': 'null'
                                 })
-busyness('environment', env_id)
+busyness('environment', env_id=env_id)
 print(http_status('Add ExpressRoute', api_response))
 exr_id = id_str(api_response, 'ExpressRoute connection')
 print('exr_id = %s' % exr_id)
@@ -248,12 +241,9 @@ api_response = requests.post(skytap_url('env_network', env_id=env_id, network_id
                              params={
                                  'vpn_id': exr_id
                              })
-busyness('environment', env_id)
-busyness('vpn', env_id, network_id, exr_id)
+busyness('environment', env_id=env_id)
+busyness('vpn', env_id=env_id, network_id=network_id, exr_id=exr_id)
 print(http_status('Attach network to ExpressRoute', api_response))
-
-
-# check it WAN is busy
 
 
 ## Include remote subnet
@@ -262,8 +252,8 @@ api_response = requests.post(skytap_url('subnet', exr_id=exr_id),
                              params={
                                  'cidr_block': remote_subnet
                              })
-busyness('environment', env_id)
-busyness('vpn', env_id, network_id, exr_id)
+busyness('environment', env_id=env_id)
+busyness('vpn', env_id=env_id, network_id=network_id, exr_id=exr_id)
 print(http_status('Include remote subnet', api_response))
 
 
@@ -273,12 +263,9 @@ api_response = requests.put(skytap_url('env_network_exr', env_id=env_id, network
                             params={
                                 'connected': True
                             })
-busyness('environment', env_id)
-busyness('vpn', env_id, network_id, exr_id)
+busyness('environment', env_id=env_id)
+busyness('vpn', env_id=env_id, network_id=network_id, exr_id=exr_id)
 print(http_status('Connect network to ExpressRoute', api_response))
-
-
-# check if network and WAN are busy
 
 
 ## Enable ExpressRoute
@@ -287,8 +274,8 @@ api_response = requests.put(skytap_url('temp_name', exr_id=exr_id),
                             params={
                                 'enabled': True
                             })
-busyness('environment', env_id)
-busyness('vpn', env_id, network_id, exr_id)
+busyness('environment', env_id=env_id)
+busyness('vpn', env_id=env_id, network_id=network_id, exr_id=exr_id)
 print(http_status('Enable ExpressRoute', api_response))
 
 
