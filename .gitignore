@@ -7,6 +7,9 @@ test_scenario2.py
 # Ignore test scenario #3 
 test_scenario3.py
 
+# Ignore test scenario #4
+test_scenario4.py
+
 # Ignore Randy C.'s JS code reference
 busyness.ps1
 

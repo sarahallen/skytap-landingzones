@@ -33,7 +33,7 @@ vm2_template = '2111381' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
 exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
-exr_key = '1f5333fe-f303-4316-898f-eb4fbe245e2c' # Azure ExpressRoute service key
+exr_key = '71f0b35d-9938-4cdd-8b36-32410ecbca1e' # Azure ExpressRoute service key
 remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 ## Constants
@@ -72,7 +72,7 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
     elif type == 'subnet':
         return url+ f'vpns/{exr_id}/subnets.json'
     
-    # To attach environment's network to ExpressRoute
+    # To attach ExpressRoute to environment's network
     elif type == 'env_network':
         return url + f'configurations/{env_id}/networks/{network_id}/vpns.json'
 
@@ -124,14 +124,20 @@ def busyness(type, env_id='', network_id='', exr_id=''):
         check = json.loads(get_vpns(env_id, network_id,exr_id).text)
 
         ## check that 'pnc' exists, if not have it dump pretty json to see what it gives you.
-        if check['pnc']:
+        if 'pnc' in check:
+            count = 0
             while check['pnc']['status'] != 'provisioned':
                 if check['pnc']['status'] == 'error':
                     raise RuntimeError('ExpressRoute could not be provisioned')
 
                 print('waiting on ExpressRoute runstate status to proceed...')
                 time.sleep(3)
-                check = json.loads(get_vpns(env_id, network_id,exr_id).text)
+                
+                count += 1
+                check = json.loads(get_vpns(env_id, network_id,exr_id).text)                
+                print(f'* sleep round {count} *')
+                print(json.dumps(check, indent = 4))
+
         else:
             output = json.loads(get_vpns(env_id, network_id,exr_id).text)
             return json.dumps(output, indent = 4)
@@ -187,7 +193,8 @@ api_response = requests.put(skytap_url('environment', env_id=env_id),
                             })
 busyness('environment', env_id=env_id)
 print(http_status('Configure environment network', api_response))
-network_id = api_response.json()['id']
+network_id = str(api_response.json()['networks'][0]['id'])
+print('network_id = %s' % network_id)
 
 
 ## Acquire public IP in same region as environment
@@ -226,6 +233,7 @@ api_response = requests.post(skytap_url('wan'),
 busyness('environment', env_id=env_id)
 print(http_status('Add ExpressRoute', api_response))
 exr_id = id_str(api_response, 'ExpressRoute connection')
+busyness('vpn', env_id=env_id, network_id=network_id, exr_id=exr_id)
 print('exr_id = %s' % exr_id)
 
 
@@ -271,8 +279,3 @@ api_response = requests.put(skytap_url('temp_name', exr_id=exr_id),
 busyness('environment', env_id=env_id)
 busyness('vpn', env_id=env_id, network_id=network_id, exr_id=exr_id)
 print(http_status('Enable ExpressRoute', api_response))
-
-
-
-## (?) do we want to send a GET request at the end for user to look at their new configurations?
-#   --> incorporate URL that takes to Skytap interface in GET response
