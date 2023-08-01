@@ -18,7 +18,7 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
 
 ## How to run this script ##
 Set up your Azure ExpressRoute prior to running this script. You can utilize your 
-Azure portal ot the following Azure Networking scripts on GitHub: 
+Azure portal or the following Azure Networking scripts on GitHub: 
 https://github.com/poomnupong/azure-networking.git
 
 We recommend running this Skytap Landing Zones script in you Azure account's PowerShell. 
