@@ -70,7 +70,9 @@ https://help.skytap.com/API_Documentation.html#top
     - Connect environment's network to ExpressRoute
 
 
+
+
 #### Disclaimer: ####
-Sections of this script not included in the API v1 documentations are not
-supported, and may therefore not function properly in the foreseeable future--as
-it may be the case with Azure ExpressRoute connectivity and enabling. 
+Sections of this script not included in the API v1 documentation are not
+supported, and may therefore not function properly in the foreseeable future––as
+it may be the case with Azure ExpressRoute connectivity and enablement. 
