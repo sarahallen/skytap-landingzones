@@ -9,31 +9,17 @@ You will need to define the following variables prior to creating your landing z
 Please gather and fill in all your information prior to running your script.
 ** input all as strings ** 
 '''
-# user_account = 'account@skytap.com' # Skytap user account
-# API_key = '0000000' # API key or user account password
-# env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
-# env_template = '0000000' # Insert region-based environment template ID
-# env_name = 'Sample Name' # Assign preferred name to your new environment
-# vm1_template = '0000000' # Insert region-based VM template ID
-# vm2_template = '0000000' # Insert region-based VM template ID
-# env_subnet = '10.0.0.0/24' # Define network subnet address range
-# env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-# exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
-# exr_key = '0000000' # Azure ExpressRoute service key
-# remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
-
-
-user_account = 'sarah_admin' # Skytap user account
-API_key = 'ad61e8a4a1ecca7211c5f6f27f4136d13890a2fe' # API key or user account password
-env_region = 'US-Texas-M-1' # Insert region name of your landing zone (see README)
-env_template = '2110325' # Insert region-based environment template ID
-env_name = 'Test-Env-Ihovanna' # Assign preferred name to your new environment
-vm1_template = '2110325' # Insert region-based VM template ID
-vm2_template = '2111381' # Insert region-based VM template ID
+user_account = 'account@skytap.com' # Skytap user account
+API_key = '0000000' # API key or user account password
+env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
+env_template = '0000000' # Insert region-based environment template ID
+env_name = 'Sample Name' # Assign preferred name to your new environment
+vm1_template = '0000000' # Insert region-based VM template ID
+vm2_template = '0000000' # Insert region-based VM template ID
 env_subnet = '10.0.0.0/24' # Define network subnet address range
 env_gateway = '10.0.0.254' # Define network gateway IPv4 address
-exr_name = 'Test-ExR-Ihovanna' # Assign preferred name to ExpressRoute circuit
-exr_key = '71f0b35d-9938-4cdd-8b36-32410ecbca1e' # Azure ExpressRoute service key
+exr_name = 'Sample Name' # Assign preferred name to ExpressRoute circuit
+exr_key = '0000000' # Azure ExpressRoute service key
 remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's subnet
 
 ## Constants
@@ -41,10 +27,10 @@ remote_subnet = '10.1.0.0/24' # Remote subnet cannot overlap with environment's 
 These variables and functions will be constantly used throughout the script.
 Do not modify them. 
 '''
-
 url = 'https://cloud.skytap.com/'
 auth = (user_account, API_key)
-headers = { 'Accept': 'application/json', 'Content-type': 'application/json'}
+headers = { 'Accept': 'application/json',
+            'Content-type': 'application/json'}
 
 def skytap_url(type, env_id='', network_id='', exr_id=''):
     # To create new environments
@@ -70,7 +56,7 @@ def skytap_url(type, env_id='', network_id='', exr_id=''):
 
     # To include remote subnet
     elif type == 'subnet':
-        return url+ f'vpns/{exr_id}/subnets.json'
+        return url + f'vpns/{exr_id}/subnets.json'
     
     # To attach ExpressRoute to environment's network
     elif type == 'env_network':
@@ -123,9 +109,7 @@ def busyness(type, env_id='', network_id='', exr_id=''):
     elif type == 'vpn':
         check = json.loads(get_vpns(env_id, network_id,exr_id).text)
 
-        ## check that 'pnc' exists, if not have it dump pretty json to see what it gives you.
         if 'pnc' in check:
-            count = 0
             while check['pnc']['status'] != 'provisioned':
                 if check['pnc']['status'] == 'error':
                     raise RuntimeError('ExpressRoute could not be provisioned')
@@ -133,14 +117,7 @@ def busyness(type, env_id='', network_id='', exr_id=''):
                 print('waiting on ExpressRoute runstate status to proceed...')
                 time.sleep(3)
                 
-                count += 1
                 check = json.loads(get_vpns(env_id, network_id,exr_id).text)                
-                print(f'* sleep round {count} *')
-                print(json.dumps(check, indent = 4))
-
-        else:
-            output = json.loads(get_vpns(env_id, network_id,exr_id).text)
-            return json.dumps(output, indent = 4)
     
     return check
 
