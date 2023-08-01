@@ -17,11 +17,15 @@ These scripts use Skytap Python REST API v1 to perform the following operations:
 * May need to install `requests` library.
 
 ## How to run this script ##
-We recommend running this script in you Azure account's PowerShell. 
---> (?) Are we to only run this script after running Poom's ARM/Bicep templates? (?) <--
+Set up your Azure ExpressRoute prior to running this script. You can utilize your 
+Azure portal ot the following Azure Networking scripts on GitHub: 
+https://github.com/poomnupong/azure-networking.git
 
-You can clone this repo, save it to your machine, then upload the script to your
-Azure account's PowerShell. For a more detailed set of steps, follow:
+We recommend running this Skytap Landing Zones script in you Azure account's PowerShell. 
+
+Alternatively, you can clone this repo, save it to your machine, 
+then upload the script to your Azure account's PowerShell. 
+For a more detailed set of steps, follow:
 https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files
 
 ### Skytap Regions ###
@@ -64,3 +68,9 @@ https://help.skytap.com/API_Documentation.html#top
 
 'https://cloud.skytap.com/configurations/{env_id}/networks/{network_id}/vpns/{exr_id}.json' --> ExpressRoute WAN
     - Connect environment's network to ExpressRoute
+
+
+#### Disclaimer: ####
+Sections of this script not included in the API v1 documentations are not
+supported, and may therefore not function properly in the foreseeable future--as
+it may be the case with Azure ExpressRoute connectivity and enabling. 
