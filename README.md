@@ -11,18 +11,15 @@ Get started with Skytap Environment creation using the Rest API. This script is 
 * An active Skytap account or Skytap on Azure services. 
 * Skytap account email address or Skytap on Azure auto-generated email address. 
 * Skytap [REST API key](https://help.skytap.com/kb-generate-api-token.html) or Skytap account password.
-* An active Azure ExpressRoute service key. [Follow Skytap's documentation to create a customer-managed ExpressRoute in Azure](https://help.skytap.com/wan-create-self-managed-expressroute.html)
+* An active Azure ExpressRoute service key. Follow [Skytap's documentation to create a customer-managed ExpressRoute in Azure.](https://help.skytap.com/wan-create-self-managed-expressroute.html)
 * May need to install `requests` library.
 
 ## How to run this script ##
 Set up your Azure ExpressRoute prior to running this script. You can utilize your 
-Azure portal or the following Azure Networking scripts on GitHub: 
-https://github.com/poomnupong/azure-networking.git
+Azure portal or use [Azure Networking scripts on GitHub.](https://github.com/poomnupong/azure-networking.git)
 
 You can clone this repo, save it to your machine, 
-then upload the script to your Azure account's PowerShell. 
-For a more detailed set of steps, follow:
-https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files
+then [upload the script to your Azure account's PowerShell.](https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files)
 
 ### Skytap Regions ###
     - APAC-2
@@ -42,8 +39,7 @@ https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upl
     - US-West
     
 #### Public Templates:
-Skytap provides public templates for customer use. Various operating systems and versions are available, and can be found in a Skytap account under 'Environments' > 'Templates':
-[Template Documentation](https://help.skytap.com/using-public-templates.html)
+Skytap provides [public templates](https://help.skytap.com/using-public-templates.html) for customer use. Various operating systems and versions are available, and can be found in a Skytap account under 'Environments' > 'Templates'.
 
 This script uses Template IDs for environment and VM creation. Here is a reference for a few common templates used in customer environments:
 
@@ -66,7 +62,7 @@ https://help.skytap.com/API_Documentation.html#top
     - Configure network
 
 'https://cloud.skytap.com/ips/acquire.json' --> IP addresses
-    - Generate an public IP address (???)
+    - Generate an public IP address
 
 'https://cloud.skytap.com/vpns.json' --> WAN resources
     - Create new ExpressRoute
