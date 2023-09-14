@@ -11,7 +11,7 @@ Please gather and fill in all your information prior to running your script.
 '''
 user_account = 'account@skytap.com' # Skytap user account
 API_key = '0000000' # API key or user account password
-env_region = 'Sample-Region' # Insert region name of your landing zone (see README)
+env_region = 'Sample-Region' # Insert region name of your landing zone (see README )
 env_template = '0000000' # Insert region-based environment template ID
 env_name = 'Sample Name' # Assign preferred name to your new environment
 vm1_template = '0000000' # Insert region-based VM template ID
