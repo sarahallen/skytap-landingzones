@@ -12,7 +12,7 @@ Get started with Skytap Environment creation using the Rest API. This script is 
 * Skytap account email address or Skytap on Azure auto-generated email address. 
 * Skytap REST API key or Skytap account password.
   [Link Text](https://help.skytap.com/kb-generate-api-token.html)
-* An active Azure ExpressRoute service key. Follow Skytap's documentation for created a customer-managed ExpressRoute in Azure: [Link Text](https://help.skytap.com/wan-create-self-managed-expressroute.html)
+* An active Azure ExpressRoute service key. Follow Skytap's documentation for created a customer-managed ExpressRoute in Azure: [ExpressRoutes](https://help.skytap.com/wan-create-self-managed-expressroute.html)
 * May need to install `requests` library.
 
 ## How to run this script ##
@@ -44,7 +44,7 @@ https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upl
     
 #### Public Templates:
 Skytap provides public templates for customer use. Various operating systems and versions are available, and can be found in a Skytap account under 'Templates':
-[Link Text](https://help.skytap.com/using-public-templates.html)
+[Template Documentation](https://help.skytap.com/using-public-templates.html)
 
 This script uses Template IDs for environment and VM creation. Here is a reference for a few common templates used in customer environments:
 
