@@ -1,19 +1,18 @@
 # Skytap Landing Zones #
-Get started with Skytap Environment creation using the Rest API.
+Get started with Skytap Environment creation using the Rest API. This script is a template that, when edited to include user-specific credentials and variables, will:
 
-These scripts use Skytap Python REST API v1 to perform the following operations:
-- Deliver a summary of all existing environments within a Skytap account. 
 - Create a new environment within a Skytap account.
-- Create two LPARs/VMs within an existing environment. 
+- Create two LPARs/VMs within the environment. 
 - Configure the environment's network.
-- Acquire a public IP for account.
-- Add an ExpressRoute circuit WAN to environment. 
+- Establish a connection with an Existing Azure ExpressRoute.
+- Connect the newly created Skytap environment nextwork to the ExpressRoute.
 
 ## Pre-Requisites: ##
 * An active Skytap account or Skytap on Azure services. 
 * Skytap account email address or Skytap on Azure auto-generated email address. 
 * Skytap REST API key or Skytap account password.
-* An active Azure ExpressRoute service key. 
+  [Link Text](https://help.skytap.com/kb-generate-api-token.html)
+* An active Azure ExpressRoute service key. Follow Skytap's documentation for created a customer-managed ExpressRoute in Azure: [Link Text](https://help.skytap.com/wan-create-self-managed-expressroute.html)
 * May need to install `requests` library.
 
 ## How to run this script ##
@@ -21,9 +20,7 @@ Set up your Azure ExpressRoute prior to running this script. You can utilize you
 Azure portal or the following Azure Networking scripts on GitHub: 
 https://github.com/poomnupong/azure-networking.git
 
-We recommend running this Skytap Landing Zones script in you Azure account's PowerShell. 
-
-Alternatively, you can clone this repo, save it to your machine, 
+You can clone this repo, save it to your machine, 
 then upload the script to your Azure account's PowerShell. 
 For a more detailed set of steps, follow:
 https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upload-files
@@ -44,10 +41,22 @@ https://learn.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage#upl
     - US-Texas-M-1
     - US-Virginia-M-1
     - US-West
+    
+#### Public Templates:
+Skytap provides public templates for customer use. Various operating systems and versions are available, and can be found in a Skytap account under 'Templates':
+[Link Text](https://help.skytap.com/using-public-templates.html)
+
+This script uses Template IDs for environment and VM creation. Here is a reference for a few common templates used in customer environments:
+
+| Template    | ID | 
+| -------- | ------- |
+| Windows Server 2022 Standard Sysprepped  | 2111381    |
+| IBM i 7.4 TR 5   | 2110325     |
+| AIX - AIX7.3TL0SP1-2148    | 2125303   |
+| Ubuntu 18.04.1 LTS Desktop Firstboot    | 2038279  |
 
 #### Skytap REST API v1 documentation:
 https://help.skytap.com/API_Documentation.html#top
-
 
 #### API Request endpoints utilized: ####
 'https://cloud.skytap.com/configurations.json' --> all environments
