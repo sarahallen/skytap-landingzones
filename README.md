@@ -48,12 +48,12 @@ Skytap provides public templates for customer use. Various operating systems and
 
 This script uses Template IDs for environment and VM creation. Here is a reference for a few common templates used in customer environments:
 
-| Template    | ID | Region |
-| -------- | ------- |
-| Windows Server 2022 Standard Sysprepped  | 2111381    | US-Texas-M-1 |
-| IBM i 7.4 TR 5   | 2110325     | US-Texas-M-1 |
-| AIX - AIX7.3TL0SP1-2148    | 2125303   | US-Texas-M-1 |
-| Ubuntu 18.04.1 LTS Desktop Firstboot    | 2038279  | US-Texas-M-1 |
+| Template              | ID | Region |
+| :---------------- | :------: | ----: |
+| Windows Server 2022 Standard Sysprepped        |   2111381   | US-Texas-M-1 |
+| IBM i 7.4 TR 5           |   2110325   | US-Texas-M-1 |
+| AIX - AIX7.3TL0SP1-2148    |  2125303   | US-Texas-M-1 |
+| Ubuntu 18.04.1 LTS Desktop Firstboot |  2038279   | US-Texas-M-1 |
 
 #### Skytap REST API v1 documentation:
 https://help.skytap.com/API_Documentation.html#top
